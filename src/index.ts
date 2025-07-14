@@ -1,68 +1,101 @@
-import express from 'express';
-import cors from 'cors';
-import helmet from 'helmet';
-import rateLimit from 'express-rate-limit';
+import express, { Request, Response } from 'express';
 import dotenv from 'dotenv';
-import { storyRoutes } from './routes/storyRoutes';
-import { errorHandler } from './middleware/errorHandler';
+import cors from 'cors';
+import {
+	corsOptions,
+	securityHeaders,
+	generalRateLimit,
+	requestLogger,
+	errorHandler,
+} from './middleware/security';
+import aiRoutes from './routes/ai.routes';
+import petsRoutes from './routes/pets.routes';
 
 // Load environment variables
 dotenv.config();
 
+// Validate required environment variables
+const requiredEnvVars = ['OPENAI_API_KEY'];
+const missingEnvVars = requiredEnvVars.filter(
+	(varName) => !process.env[varName]
+);
+
+if (missingEnvVars.length > 0) {
+	console.error('Missing required environment variables:', missingEnvVars);
+	process.exit(1);
+}
+
+// Create Express app
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// Security middleware
-app.use(helmet());
-
-// Rate limiting
-const limiter = rateLimit({
-  windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS || '900000'), // 15 minutes
-  max: parseInt(process.env.MAX_REQUESTS_PER_WINDOW || '10'),
-  message: 'Too many requests from this IP, please try again later.'
-});
-app.use(limiter);
-
-// CORS configuration
-const corsOptions = {
-  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
-  credentials: true,
-  optionsSuccessStatus: 200
-};
+// Apply security middleware
+app.use(securityHeaders);
 app.use(cors(corsOptions));
+app.use(generalRateLimit);
 
-// Body parsing middleware
+// Parse JSON bodies
 app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+app.use(express.urlencoded({ extended: true }));
+
+// Request logging
+if (process.env.NODE_ENV === 'development') {
+	app.use(requestLogger);
+}
 
 // Health check endpoint
-app.get('/health', (req, res) => {
-  res.status(200).json({ 
-    status: 'OK', 
-    timestamp: new Date().toISOString(),
-    environment: process.env.NODE_ENV || 'development'
-  });
+app.get('/api/health', (req: Request, res: Response) => {
+	res.json({
+		status: 'healthy',
+		timestamp: new Date().toISOString(),
+		version: '1.0.0',
+		services: {
+			openai: !!process.env.OPENAI_API_KEY,
+			pims: !!process.env.PIMS_BASE_URL,
+			xano: !!process.env.XANO_BASE_URL,
+		},
+	});
 });
 
 // API routes
-app.use('/api', storyRoutes);
-
-// Error handling middleware
-app.use(errorHandler);
+app.use('/api', aiRoutes);
+app.use('/api/pets', petsRoutes);
 
 // 404 handler
-app.use('*', (req, res) => {
-  res.status(404).json({ 
-    error: 'Route not found',
-    path: req.originalUrl
-  });
+app.use('*', (req: Request, res: Response) => {
+	res.status(404).json({
+		error: 'Endpoint not found',
+		message: `${req.method} ${req.originalUrl} is not a valid endpoint`,
+	});
 });
+
+// Error handling middleware (must be last)
+app.use(errorHandler);
 
 // Start server
 app.listen(PORT, () => {
-  console.log(`🚀 Pet Story Generator Backend running on port ${PORT}`);
-  console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`🔗 Frontend URL: ${process.env.FRONTEND_URL || 'http://localhost:5173'}`);
+	console.log(`🚀 Server running on port ${PORT}`);
+	console.log(`📊 Health check: http://localhost:${PORT}/api/health`);
+	console.log(`🔗 Frontend URL: ${process.env.FRONTEND_URL}`);
+	console.log(`🐕 PIMS URL: ${process.env.PIMS_BASE_URL}`);
+	console.log(`💾 Xano configured: ${!!process.env.XANO_BASE_URL}`);
+
+	if (process.env.NODE_ENV === 'development') {
+		console.log('\n📋 Available endpoints:');
+		console.log('  GET  /api/health');
+		console.log('  GET  /api/pets');
+		console.log('  GET  /api/pets/:id');
+		console.log('  POST /api/generate-story');
+	}
 });
 
-export default app;
+// Graceful shutdown
+process.on('SIGTERM', () => {
+	console.log('SIGTERM received, shutting down gracefully');
+	process.exit(0);
+});
+
+process.on('SIGINT', () => {
+	console.log('SIGINT received, shutting down gracefully');
+	process.exit(0);
+});

@@ -3,9 +3,11 @@
 # Pet Story Generator Backend - Copilot Instructions
 
 ## Project Overview
+
 This is a Node.js/TypeScript backend service for generating personalized pet stories using OpenAI's GPT API. The service includes integrations with PIMS (Pet Information Management System) and Xano database.
 
 ## Architecture Guidelines
+
 - Use TypeScript with strict type checking
 - Follow Express.js patterns with controllers, services, and middleware
 - Implement proper error handling with custom error types
@@ -13,6 +15,7 @@ This is a Node.js/TypeScript backend service for generating personalized pet sto
 - Follow RESTful API conventions
 
 ## Code Style
+
 - Use async/await instead of promises
 - Implement proper TypeScript interfaces for all data structures
 - Use dependency injection where appropriate
@@ -20,6 +23,7 @@ This is a Node.js/TypeScript backend service for generating personalized pet sto
 - Include proper error handling in all functions
 
 ## Security Considerations
+
 - Always validate user input using Zod schemas
 - Implement rate limiting for API endpoints
 - Use environment variables for sensitive configuration
@@ -27,6 +31,7 @@ This is a Node.js/TypeScript backend service for generating personalized pet sto
 - Follow CORS best practices
 
 ## OpenAI Integration
+
 - Use the official OpenAI SDK
 - Implement proper error handling for API failures
 - Use appropriate temperature settings for creative text generation
@@ -34,12 +39,14 @@ This is a Node.js/TypeScript backend service for generating personalized pet sto
 - Cache responses when appropriate
 
 ## Testing
+
 - Write unit tests for services and controllers
 - Mock external API calls in tests
 - Test error scenarios and edge cases
 - Validate TypeScript types in tests
 
 ## Environment Setup
+
 - Use dotenv for environment variable management
 - Provide clear .env.example with all required variables
 - Document all environment variables in README.md
