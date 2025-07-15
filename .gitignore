@@ -3,15 +3,14 @@ node_modules/
 
 # Environment variables
 .env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
 
-# OS generated files
-.DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
+# Build outputs
+dist/
+build/
 
 # Logs
 logs
@@ -28,6 +27,7 @@ pids
 
 # Coverage directory used by tools like istanbul
 coverage/
+*.lcov
 
 # nyc test coverage
 .nyc_output
@@ -38,6 +38,9 @@ jspm_packages/
 
 # Optional npm cache directory
 .npm
+
+# Optional eslint cache
+.eslintcache
 
 # Optional REPL history
 .node_repl_history
@@ -51,7 +54,6 @@ jspm_packages/
 # dotenv environment variables file
 .env
 .env.test
-.env.production
 
 # parcel-bundler cache (https://parceljs.org/)
 .cache
@@ -63,11 +65,11 @@ jspm_packages/
 # nuxt.js build output
 .nuxt
 
-# vuepress build directory
+# vuepress build output
 .vuepress/dist
 
 # Serverless directories
-.serverless
+.serverless/
 
 # FuseBox cache
 .fusebox/
@@ -75,14 +77,12 @@ jspm_packages/
 # DynamoDB Local files
 .dynamodb/
 
-# TernJS port file
-.tern-port
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
 
-# Compiled binary addons (https://nodejs.org/api/addons.html)
-build/Release/
-
-# TypeScript build output
-dist/
-build/
-node_modules
-node_modules
+# OS
+.DS_Store
+Thumbs.db
