@@ -45,6 +45,9 @@ export const corsOptions = {
 			'http://127.0.0.1:5173/', // With trailing slash
 			'http://192.168.1.97:5173', // Network IP address
 			'http://192.168.1.97:5173/', // Network IP address with trailing slash
+			// Production Vercel frontend
+			'https://pet-story-generator-18ror73rr-misael-ms-projects.vercel.app',
+			'https://pet-story-generator-18ror73rr-misael-ms-projects.vercel.app/',
 		];
 
 		// Allow requests with no origin (mobile apps, Postman, etc.)
