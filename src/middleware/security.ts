@@ -41,16 +41,38 @@ export const corsOptions = {
 			process.env.FRONTEND_URL || 'http://localhost:5173',
 			'http://localhost:3000', // React dev server alternative
 			'http://127.0.0.1:5173', // Alternative localhost
+			'http://localhost:5173/', // With trailing slash
+			'http://127.0.0.1:5173/', // With trailing slash
+			'http://192.168.1.97:5173', // Network IP address
+			'http://192.168.1.97:5173/', // Network IP address with trailing slash
 		];
 
 		// Allow requests with no origin (mobile apps, Postman, etc.)
 		if (!origin) return callback(null, true);
 
-		if (allowedOrigins.includes(origin)) {
+		// Remove trailing slash from origin for comparison
+		const normalizedOrigin = origin?.replace(/\/$/, '');
+		const normalizedAllowedOrigins = allowedOrigins.map(url => url.replace(/\/$/, ''));
+
+		// Check exact matches first
+		if (normalizedAllowedOrigins.includes(normalizedOrigin || '')) {
+			console.log(`CORS: Allowing origin: ${origin}`);
 			callback(null, true);
-		} else {
-			callback(new Error('Not allowed by CORS'));
+			return;
 		}
+
+		// For development: allow any local network IP on port 5173
+		if (process.env.NODE_ENV !== 'production') {
+			const localNetworkPattern = /^https?:\/\/(192\.168\.\d+\.\d+|10\.\d+\.\d+\.\d+|172\.(1[6-9]|2\d|3[01])\.\d+\.\d+):5173\/?$/;
+			if (localNetworkPattern.test(origin)) {
+				console.log(`CORS: Allowing local network origin: ${origin}`);
+				callback(null, true);
+				return;
+			}
+		}
+
+		console.log(`CORS: Rejecting origin: ${origin}. Allowed origins:`, allowedOrigins);
+		callback(new Error('Not allowed by CORS'));
 	},
 	credentials: true,
 	optionsSuccessStatus: 200,
