@@ -13,7 +13,12 @@ export const storyRequestSchema = z.object({
 		moderationCheck: z.boolean(),
 		saveToXano: z.boolean().optional(),
 		petId: z.string().optional(),
-		formData: z.record(z.unknown()).optional(),
+		// More specific typing for form data - common fields we expect
+		formData: z
+			.record(
+				z.union([z.string(), z.number(), z.boolean(), z.array(z.string())])
+			)
+			.optional(),
 	}),
 });
 
@@ -40,6 +45,16 @@ export interface OpenAIResponse {
 	};
 }
 
+// Medical history entry type for better PIMS typing
+export interface MedicalHistoryEntry {
+	date?: string;
+	condition?: string;
+	treatment?: string;
+	notes?: string;
+	veterinarian?: string;
+	[key: string]: unknown; // For unknown medical fields
+}
+
 // PIMS types
 export interface PIMSPet {
 	id: string;
@@ -53,7 +68,7 @@ export interface PIMSPet {
 	owner_name?: string;
 	owner_email?: string;
 	owner_phone?: string;
-	medical_history?: unknown[];
+	medical_history?: MedicalHistoryEntry[];
 	created_at?: string;
 	updated_at?: string;
 	[key: string]: unknown; // For unknown PIMS fields
@@ -67,12 +82,32 @@ export interface XanoStoryPayload {
 	tone: string;
 	suggested_goal: number;
 	key_points: string[];
-	form_data: Record<string, unknown>;
+	form_data: Record<string, string | number | boolean | string[]>;
 }
 
-// Error types
+// More specific error types
 export interface APIError {
 	error: string;
 	message?: string;
-	details?: unknown;
+	details?: string | object; // More specific than unknown
 }
+
+// Story response structure for better type safety in routes
+export interface StoryResponse {
+	title: string;
+	content: string;
+	tone: string;
+	suggestedGoal: number;
+	keyPoints: string[];
+}
+
+// Add validation schema for story response parsing
+export const storyResponseSchema = z.object({
+	title: z.string().default('Generated Pet Story'),
+	content: z.string(),
+	tone: z.string().default('heartwarming'),
+	suggestedGoal: z.number().default(5000),
+	keyPoints: z.array(z.string()).default([]),
+});
+
+export type StoryResponseData = z.infer<typeof storyResponseSchema>;
