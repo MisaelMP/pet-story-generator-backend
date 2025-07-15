@@ -2,39 +2,36 @@ import axios, { AxiosInstance } from 'axios';
 import { PIMSPet } from '../types';
 
 export class PIMSService {
-	private static client: AxiosInstance = axios.create({
-		...(process.env.PIMS_BASE_URL
-			? { baseURL: process.env.PIMS_BASE_URL }
-			: {}),
-		timeout: 15000,
-		headers: {
-			'Content-Type': 'application/json',
-			...(process.env.PIMS_API_KEY && {
-				Authorization: `Bearer ${process.env.PIMS_API_KEY}`,
-			}),
-		},
-	});
+	private static _client: AxiosInstance | null = null;
+
+	private static get client(): AxiosInstance {
+		if (!this._client) {
+			this._client = axios.create({
+				baseURL:
+					process.env.PIMS_BASE_URL || 'https://api.mybalto.com/api:D60OKSek',
+				timeout: 15000,
+				headers: {
+					'Content-Type': 'application/json',
+					...(process.env.PIMS_API_KEY && {
+						Authorization: `Bearer ${process.env.PIMS_API_KEY}`,
+					}),
+				},
+			});
+		}
+		return this._client;
+	}
 
 	static async getAllPets(): Promise<PIMSPet[]> {
 		try {
-			console.log('Fetching pets from PIMS:', process.env.PIMS_BASE_URL);
-
 			const response = await this.client.get('/pims/patients');
-
-			console.log('PIMS Response:', {
-				status: response.status,
-				dataType: typeof response.data,
-				isArray: Array.isArray(response.data),
-				count: Array.isArray(response.data)
-					? response.data.length
-					: 'not array',
-			});
 
 			// Handle different possible response formats
 			let petsData: PIMSPet[];
 
 			if (Array.isArray(response.data)) {
 				petsData = response.data;
+			} else if (response.data.items && Array.isArray(response.data.items)) {
+				petsData = response.data.items;
 			} else if (response.data.data && Array.isArray(response.data.data)) {
 				petsData = response.data.data;
 			} else if (
@@ -69,7 +66,7 @@ export class PIMSService {
 				if (error.response?.status === 404) {
 					throw new Error('PIMS endpoint not found');
 				}
-				if (error.response?.status >= 500) {
+				if (error.response?.status && error.response.status >= 500) {
 					throw new Error('PIMS server error');
 				}
 			}
