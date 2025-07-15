@@ -52,7 +52,9 @@ export const corsOptions = {
 
 		// Remove trailing slash from origin for comparison
 		const normalizedOrigin = origin?.replace(/\/$/, '');
-		const normalizedAllowedOrigins = allowedOrigins.map(url => url.replace(/\/$/, ''));
+		const normalizedAllowedOrigins = allowedOrigins.map((url) =>
+			url.replace(/\/$/, '')
+		);
 
 		// Check exact matches first
 		if (normalizedAllowedOrigins.includes(normalizedOrigin || '')) {
@@ -63,7 +65,8 @@ export const corsOptions = {
 
 		// For development: allow any local network IP on port 5173
 		if (process.env.NODE_ENV !== 'production') {
-			const localNetworkPattern = /^https?:\/\/(192\.168\.\d+\.\d+|10\.\d+\.\d+\.\d+|172\.(1[6-9]|2\d|3[01])\.\d+\.\d+):5173\/?$/;
+			const localNetworkPattern =
+				/^https?:\/\/(192\.168\.\d+\.\d+|10\.\d+\.\d+\.\d+|172\.(1[6-9]|2\d|3[01])\.\d+\.\d+):5173\/?$/;
 			if (localNetworkPattern.test(origin)) {
 				console.log(`CORS: Allowing local network origin: ${origin}`);
 				callback(null, true);
@@ -71,7 +74,6 @@ export const corsOptions = {
 			}
 		}
 
-		console.log(`CORS: Rejecting origin: ${origin}. Allowed origins:`, allowedOrigins);
 		callback(new Error('Not allowed by CORS'));
 	},
 	credentials: true,

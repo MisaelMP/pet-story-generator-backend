@@ -56,26 +56,30 @@ src/
 ## Installation
 
 1. **Clone the repository**
+
    ```bash
    git clone <repository-url>
    cd pet-story-generator-backend
    ```
 
 2. **Install dependencies**
+
    ```bash
    npm install
    ```
 
 3. **Configure environment variables**
+
    ```bash
    cp .env.example .env
    ```
 
 4. **Edit the `.env` file with your configuration**
+
    ```bash
    # Required: Add your OpenAI API key
    OPENAI_API_KEY=sk-your-openai-api-key-here
-   
+
    # Optional: Configure other services as needed
    ```
 
@@ -83,23 +87,23 @@ src/
 
 ### Required Configuration
 
-| Variable | Description | Default | Required |
-|----------|-------------|---------|----------|
-| `OPENAI_API_KEY` | OpenAI API key for story generation | - | Yes |
+| Variable         | Description                         | Default | Required |
+| ---------------- | ----------------------------------- | ------- | -------- |
+| `OPENAI_API_KEY` | OpenAI API key for story generation | -       | Yes      |
 
 ### Optional Configuration
 
-| Variable | Description | Default | Required |
-|----------|-------------|---------|----------|
-| `PORT` | Server port number | 3001 | No |
-| `NODE_ENV` | Environment mode | development | No |
-| `FRONTEND_URL` | Frontend URL for CORS configuration | http://localhost:5173 | No |
-| `PIMS_BASE_URL` | PIMS API base URL | - | No |
-| `PIMS_API_KEY` | PIMS API authentication key | - | No |
-| `XANO_BASE_URL` | Xano API base URL | - | No |
-| `XANO_API_KEY` | Xano API authentication key | - | No |
-| `MAX_REQUESTS_PER_WINDOW` | Rate limit maximum requests | 10 | No |
-| `RATE_LIMIT_WINDOW_MS` | Rate limit window in milliseconds | 900000 | No |
+| Variable                  | Description                         | Default               | Required |
+| ------------------------- | ----------------------------------- | --------------------- | -------- |
+| `PORT`                    | Server port number                  | 3001                  | No       |
+| `NODE_ENV`                | Environment mode                    | development           | No       |
+| `FRONTEND_URL`            | Frontend URL for CORS configuration | http://localhost:5173 | No       |
+| `PIMS_BASE_URL`           | PIMS API base URL                   | -                     | No       |
+| `PIMS_API_KEY`            | PIMS API authentication key         | -                     | No       |
+| `XANO_BASE_URL`           | Xano API base URL                   | -                     | No       |
+| `XANO_API_KEY`            | Xano API authentication key         | -                     | No       |
+| `MAX_REQUESTS_PER_WINDOW` | Rate limit maximum requests         | 10                    | No       |
+| `RATE_LIMIT_WINDOW_MS`    | Rate limit window in milliseconds   | 900000                | No       |
 
 ## Usage
 
@@ -112,6 +116,7 @@ npm run dev
 ```
 
 The server will start at `http://localhost:3001` with the following endpoints available:
+
 - Health check: `http://localhost:3001/api/health`
 - Pet data: `http://localhost:3001/api/pets`
 - Story generation: `http://localhost:3001/api/generate-story`
@@ -142,15 +147,16 @@ npm run lint
 Returns server status and configuration information.
 
 **Response:**
+
 ```json
 {
-  "status": "ok",
-  "timestamp": "2025-07-14T12:00:00.000Z",
-  "services": {
-    "openai": true,
-    "pims": true,
-    "xano": false
-  }
+	"status": "ok",
+	"timestamp": "2025-07-14T12:00:00.000Z",
+	"services": {
+		"openai": true,
+		"pims": true,
+		"xano": false
+	}
 }
 ```
 
@@ -161,16 +167,17 @@ Returns server status and configuration information.
 Retrieves all available pets from PIMS system.
 
 **Response:**
+
 ```json
 [
-  {
-    "id": "1",
-    "name": "Buddy",
-    "type": "Dog",
-    "breed": "Golden Retriever",
-    "age": 3,
-    "description": "Friendly and energetic dog"
-  }
+	{
+		"id": "1",
+		"name": "Buddy",
+		"type": "Dog",
+		"breed": "Golden Retriever",
+		"age": 3,
+		"description": "Friendly and energetic dog"
+	}
 ]
 ```
 
@@ -185,41 +192,43 @@ Retrieves specific pet information by ID.
 Generates a personalized story for a pet using AI.
 
 **Request Body:**
+
 ```json
 {
-  "prompt": "Create a heartwarming story about Buddy, a 3-year-old Golden Retriever who needs surgery...",
-  "parameters": {
-    "maxTokens": 500,
-    "temperature": 0.7,
-    "topP": 0.9
-  },
-  "options": {
-    "includeSuggestions": true,
-    "moderationCheck": true,
-    "saveToXano": false,
-    "petId": "1"
-  }
+	"prompt": "Create a heartwarming story about Buddy, a 3-year-old Golden Retriever who needs surgery...",
+	"parameters": {
+		"maxTokens": 500,
+		"temperature": 0.7,
+		"topP": 0.9
+	},
+	"options": {
+		"includeSuggestions": true,
+		"moderationCheck": true,
+		"saveToXano": false,
+		"petId": "1"
+	}
 }
 ```
 
 **Response:**
+
 ```json
 {
-  "story": {
-    "title": "Buddy's Journey to Recovery",
-    "content": "Generated story content...",
-    "tone": "heartwarming",
-    "suggestedGoal": 5000,
-    "keyPoints": ["loyal companion", "needs surgery", "full recovery expected"]
-  },
-  "usage": {
-    "prompt_tokens": 150,
-    "completion_tokens": 350,
-    "total_tokens": 500
-  },
-  "model": "gpt-3.5-turbo",
-  "savedToXano": false,
-  "timestamp": "2025-07-14T12:00:00.000Z"
+	"story": {
+		"title": "Buddy's Journey to Recovery",
+		"content": "Generated story content...",
+		"tone": "heartwarming",
+		"suggestedGoal": 5000,
+		"keyPoints": ["loyal companion", "needs surgery", "full recovery expected"]
+	},
+	"usage": {
+		"prompt_tokens": 150,
+		"completion_tokens": 350,
+		"total_tokens": 500
+	},
+	"model": "gpt-3.5-turbo",
+	"savedToXano": false,
+	"timestamp": "2025-07-14T12:00:00.000Z"
 }
 ```
 
@@ -229,13 +238,14 @@ The API returns structured error responses with appropriate HTTP status codes:
 
 ```json
 {
-  "error": "Error type",
-  "message": "Human-readable error message",
-  "details": "Additional error details (development only)"
+	"error": "Error type",
+	"message": "Human-readable error message",
+	"details": "Additional error details (development only)"
 }
 ```
 
 Common status codes:
+
 - `400`: Bad Request (validation errors)
 - `403`: Forbidden (CORS or rate limiting)
 - `429`: Too Many Requests (rate limit exceeded)
@@ -296,14 +306,17 @@ CMD ["npm", "start"]
 ### Common Issues
 
 1. **OpenAI API Errors**
+
    - Verify API key is valid and has sufficient quota
    - Check OpenAI service status
 
 2. **CORS Errors**
+
    - Ensure frontend URL is configured in `FRONTEND_URL`
    - Check network configuration for development
 
 3. **PIMS Connection Issues**
+
    - Verify PIMS URL and credentials
    - Check network connectivity to PIMS system
 

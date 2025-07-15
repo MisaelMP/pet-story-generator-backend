@@ -10,8 +10,7 @@ export class OpenAIService {
 				console.error('OPENAI_API_KEY environment variable is not set');
 				throw new Error('OPENAI_API_KEY environment variable is not set');
 			}
-			
-			console.log('Creating OpenAI client with API key:', process.env.OPENAI_API_KEY.substring(0, 20) + '...');
+
 			this.client = new OpenAI({
 				apiKey: process.env.OPENAI_API_KEY,
 			});
@@ -29,7 +28,7 @@ export class OpenAIService {
 	): Promise<OpenAIResponse> {
 		try {
 			const client = this.getClient();
-			
+
 			// Use gpt-3.5-turbo instead of gpt-4o for cost efficiency
 			const completion = await client.chat.completions.create({
 				model: 'gpt-3.5-turbo',
