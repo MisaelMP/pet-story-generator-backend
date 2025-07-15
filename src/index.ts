@@ -57,9 +57,9 @@ app.get('/api/health', (req: Request, res: Response) => {
 	});
 });
 
-// API routes
-app.use('/api', aiRoutes);
-app.use('/api/pets', petsRoutes);
+// API routes - FIXED: Mount routes directly under /api
+app.use('/api', aiRoutes); // This will handle /api/generate-story
+app.use('/api/pets', petsRoutes); // This will handle /api/pets and /api/pets/:id
 
 // 404 handler
 app.use('*', (req: Request, res: Response) => {

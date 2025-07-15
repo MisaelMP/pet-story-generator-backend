@@ -2,14 +2,22 @@ import OpenAI from 'openai';
 import { OpenAIResponse } from '../types';
 
 export class OpenAIService {
-	private static client = new OpenAI({
-		apiKey: (() => {
+	private static client: OpenAI | null = null;
+
+	private static getClient(): OpenAI {
+		if (!this.client) {
 			if (!process.env.OPENAI_API_KEY) {
+				console.error('OPENAI_API_KEY environment variable is not set');
 				throw new Error('OPENAI_API_KEY environment variable is not set');
 			}
-			return process.env.OPENAI_API_KEY;
-		})(),
-	});
+			
+			console.log('Creating OpenAI client with API key:', process.env.OPENAI_API_KEY.substring(0, 20) + '...');
+			this.client = new OpenAI({
+				apiKey: process.env.OPENAI_API_KEY,
+			});
+		}
+		return this.client;
+	}
 
 	static async generateStory(
 		prompt: string,
@@ -20,13 +28,16 @@ export class OpenAIService {
 		}
 	): Promise<OpenAIResponse> {
 		try {
-			const completion = await this.client.chat.completions.create({
-				model: 'gpt-4o',
+			const client = this.getClient();
+			
+			// Use gpt-3.5-turbo instead of gpt-4o for cost efficiency
+			const completion = await client.chat.completions.create({
+				model: 'gpt-3.5-turbo',
 				messages: [
 					{
 						role: 'system',
 						content:
-							'You are a professional fundraising copywriter specializing in pet medical campaigns. Always respond with valid JSON only.',
+							'You are a professional fundraising copywriter specializing in pet medical campaigns. Write engaging, heartwarming stories.',
 					},
 					{
 						role: 'user',
@@ -36,7 +47,6 @@ export class OpenAIService {
 				max_tokens: parameters.maxTokens,
 				temperature: parameters.temperature,
 				top_p: parameters.topP,
-				response_format: { type: 'json_object' },
 			});
 
 			return completion as OpenAIResponse;
@@ -52,7 +62,8 @@ export class OpenAIService {
 
 	static async moderateContent(content: string): Promise<boolean> {
 		try {
-			const moderation = await this.client.moderations.create({
+			const client = this.getClient();
+			const moderation = await client.moderations.create({
 				input: content,
 			});
 
