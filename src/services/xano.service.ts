@@ -25,7 +25,7 @@ export class XanoService {
 		return this.client;
 	}
 
-	static async saveStory(payload: XanoStoryPayload): Promise<unknown> {
+	static async saveStory(payload: XanoStoryPayload): Promise<{ id: string; title: string; [key: string]: unknown }> {
 		try {
 			const client = this.getClient();
 			console.log('Saving story to Xano:', {

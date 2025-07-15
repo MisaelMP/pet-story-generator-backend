@@ -1,5 +1,11 @@
 import { Router, Request, Response } from 'express';
-import { storyRequestSchema, StoryRequest, APIError } from '../types';
+import {
+	storyRequestSchema,
+	StoryRequest,
+	APIError,
+	StoryResponse,
+	storyResponseSchema,
+} from '../types';
 import { OpenAIService } from '../services/openai.service';
 import { XanoService } from '../services/xano.service';
 import { aiRateLimit } from '../middleware/security';
@@ -51,34 +57,18 @@ router.post(
 			}
 
 			// Handle response - try JSON first, fallback to plain text
-			let responseData: {
-				title: string;
-				content: string;
-				tone: string;
-				suggestedGoal: number;
-				keyPoints: string[];
-			};
+			let responseData: StoryResponse;
 
 			try {
 				// Try to parse as JSON first
 				const parsedContent = JSON.parse(content);
-				responseData = {
-					title: parsedContent.title || 'Generated Pet Story',
-					content: parsedContent.content || content,
-					tone: parsedContent.tone || 'heartwarming',
-					suggestedGoal: parsedContent.suggestedGoal || 5000,
-					keyPoints: parsedContent.keyPoints || [],
-				};
+				responseData = storyResponseSchema.parse(parsedContent);
 			} catch (parseError) {
 				// Fallback: treat as plain text story
 				console.log('AI returned plain text, treating as story content');
-				responseData = {
-					title: 'Generated Pet Story',
+				responseData = storyResponseSchema.parse({
 					content: content,
-					tone: 'heartwarming',
-					suggestedGoal: 5000,
-					keyPoints: [],
-				};
+				});
 			}
 
 			// Save to Xano if requested and configured
